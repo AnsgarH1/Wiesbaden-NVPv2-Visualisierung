@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { Layer, Map, NavigationControl, Source } from "react-map-gl";
+import { Layer, LngLat, Map, NavigationControl, Popup } from "react-map-gl";
 
 import { ToggleGroup, ToggleGroupItem } from "./components/ui/toggle-group";
 import { useTheme } from "./components/theme-provider";
@@ -8,80 +8,88 @@ import { ModeToggle } from "./components/mode-toggle";
 
 import "mapbox-gl/dist/mapbox-gl.css";
 
-import { m1_new, m1_old, m4_new, m4_old } from "./data/geojson";
-import { Switch } from "./components/ui/switch";
 import { Separator } from "./components/ui/separator";
 
-const M1SourceNew = ({ theme }: { theme: string }) => (
-  <Source key="m1_new" id="m1_new" type="geojson" data={m1_new}>
-    <Layer
-      key="my-layer-1"
-      type="line"
-      paint={{
-        "line-color": theme === "light" ? "#004970" : "#c8d600",
-        "line-width": 3,
-      }}
-    />
-  </Source>
-);
+import { Switch } from "./components/ui/switch";
+import { LineMapSource } from "./components/LineMapSource";
 
-const M1SourceOld = ({ theme }: { theme: string }) => (
-  <Source key="m1_old" id="m1_old" type="geojson" data={m1_old}>
-    <Layer
-      key="my-layer-1"
-      type="line"
-      paint={{
-        "line-color": theme === "light" ? "#1f4052" : "#a1a938",
-        "line-width": 3,
-        "line-dasharray": [1, 0.1],
-      }}
-    />
-  </Source>
-);
-
-const M4SourceNew = ({ theme }: { theme: string }) => (
-  <Source key="m4_new" id="m4_new" type="geojson" data={m4_new}>
-    <Layer
-      key="my-layer-1"
-      type="line"
-      paint={{
-        "line-color": theme === "light" ? "#004970" : "#ff2f00",
-        "line-width": 3,
-      }}
-    />
-  </Source>
-);
-
-const M4SourceOld = ({ theme }: { theme: string }) => (
-  <Source key="m4_old" id="m4_old" type="geojson" data={m4_old}>
-    <Layer
-      key="my-layer-1"
-      type="line"
-      paint={{
-        "line-color": theme === "light" ? "#1f4052" : "#e75858",
-        "line-width": 3,
-        "line-dasharray": [1, 0.1],
-      }}
-    />
-  </Source>
-);
+import { busLineData } from "./data";
+import { BusCategory, PlanVersion } from "./types";
+import { LineSelectionControl } from "./components/LineSelectionControl";
 
 function App() {
   const { theme } = useTheme();
 
-  const [nvpPlanVersion, setNvpPlanVersion] = useState<"old" | "new" | "both">(
-    "both"
-  );
+  const [hoverInfo, setHoverInfo] = useState<{
+    lnglat: LngLat;
+    lines: string[];
+  } | null>(null);
 
-  const [selectedM1, setSelectedM1] = useState(true);
-  const [selectedM4, setSelectedM4] = useState(true);
+  const [selectedPlanVersion, setSelectedPlanVersion] = useState<
+    "v1" | "v2" | "both"
+  >("v2");
 
-  const handleNvpPlanVersionChange = (value: string) => {
-    if (value === "old" || value === "new" || value === "both") {
-      setNvpPlanVersion(value);
-    }
-  };
+  const [selectedCategories, setSelectedCategories] = useState<BusCategory[]>([
+    BusCategory.EXPRESS,
+    BusCategory.METRO,
+    BusCategory.SPRINTER,
+    BusCategory.STADT,
+    BusCategory.QUARTIER,
+    BusCategory.REGIONAL,
+  ]);
 
+  const lineGroupsToDisplay = busLineData
+    .filter(
+      (lineGroup) =>
+        (selectedPlanVersion === "both" ||
+          lineGroup.planVersion ===
+            (selectedPlanVersion === "v1" ? PlanVersion.V1 : PlanVersion.V2)) &&
+        selectedCategories.includes(lineGroup.category)
+    )
+    .sort((b, a) => {
+      // sort by category -> metrobusses before express and sprinter busses, before rest
+      if (
+        a.category === BusCategory.METRO &&
+        b.category !== BusCategory.METRO
+      ) {
+        return -1;
+      }
+      if (
+        b.category === BusCategory.METRO &&
+        a.category !== BusCategory.METRO
+      ) {
+        return 1;
+      }
+      if (
+        a.category === BusCategory.EXPRESS &&
+        b.category !== BusCategory.EXPRESS
+      ) {
+        return -1;
+      }
+      if (
+        b.category === BusCategory.EXPRESS &&
+        a.category !== BusCategory.EXPRESS
+      ) {
+        return 1;
+      }
+      if (
+        a.category === BusCategory.SPRINTER &&
+        b.category !== BusCategory.SPRINTER
+      ) {
+        return -1;
+      }
+      if (
+        b.category === BusCategory.SPRINTER &&
+        a.category !== BusCategory.SPRINTER
+      ) {
+        return 1;
+      }
+      return 0;
+    });
+
+  const hoveredLines = lineGroupsToDisplay
+    .flatMap((lineGroup) => lineGroup.lines)
+    .filter((line) => hoverInfo?.lines.includes(line.id));
   return (
     <div className="w-screen h-screen bg-white dark:bg-slate-800 flex flex-col lg:flex-row">
       <div className="flex-1 h-full w-full bg-green-400">
@@ -100,17 +108,46 @@ function App() {
               ? "mapbox://styles/mapbox/light-v11"
               : "mapbox://styles/mapbox/dark-v11"
           }
-        >
-          {(nvpPlanVersion === "new" || nvpPlanVersion === "both") &&
-            selectedM1 && <M1SourceNew theme={theme} />}
-          {(nvpPlanVersion === "old" || nvpPlanVersion === "both") &&
-            selectedM1 && <M1SourceOld theme={theme} />}
+          interactiveLayerIds={lineGroupsToDisplay
+            .flatMap((lineGroup) => lineGroup.lines)
+            .map((line) => line.id)}
+          onMouseMove={(e) => {
+            if (e.features && e.features.length > 0) {
+              const layerIds = e.features.map((f) => f.layer.id);
 
-          {(nvpPlanVersion === "new" || nvpPlanVersion === "both") &&
-            selectedM4 && <M4SourceNew theme={theme} />}
-          {(nvpPlanVersion === "old" || nvpPlanVersion === "both") &&
-            selectedM4 && <M4SourceOld theme={theme} />}
+              setHoverInfo({
+                lnglat: e.lngLat,
+                lines: layerIds,
+              });
+            } else {
+              setHoverInfo(null);
+            }
+          }}
+        >
           <NavigationControl />
+
+          {lineGroupsToDisplay
+            .flatMap((lineGroup) => lineGroup.lines)
+            .map((line) => (
+              <LineMapSource key={line.id} line={line} />
+            ))}
+
+          {hoverInfo && hoveredLines && (
+            <Popup
+              longitude={hoverInfo.lnglat.lng}
+              latitude={hoverInfo.lnglat.lat}
+              style={{ color: "black" }}
+              maxWidth="700px"
+              closeButton={false}
+            >
+              {hoveredLines.map((line) => (
+                <p key={line.id} className="text-nowrap text-md font-semibold">
+                  {line.name}
+                </p>
+              ))}
+            </Popup>
+          )}
+          <Layer id="top-layer" type="sky" />
         </Map>
       </div>
 
@@ -120,30 +157,12 @@ function App() {
           <ModeToggle />
         </div>
         <Separator />
-        <ToggleGroup
-          type="single"
-          value={nvpPlanVersion}
-          onValueChange={handleNvpPlanVersionChange}
-        >
-          <ToggleGroupItem value="old">nur V1</ToggleGroupItem>
-          <ToggleGroupItem value="both">beide Varianten</ToggleGroupItem>
-          <ToggleGroupItem value="new">nur V2</ToggleGroupItem>
-        </ToggleGroup>
-        <Separator />
-        <h3 className="text-lg ">Linien auswählen:</h3>
-
-        <div className="flex gap-2 pt-2  w-full text-center">
-          <Switch checked={selectedM1} onCheckedChange={setSelectedM1} />
-          <div>
-            <strong>M1:</strong> Dotzheim - Bierstadt
-          </div>
-        </div>
-        <div className="flex gap-2  w-full">
-          <Switch checked={selectedM4} onCheckedChange={setSelectedM4} />
-          <p>
-            <strong>M4:</strong> Nordfriedhof - Biebrich Rheinufer
-          </p>
-        </div>
+        <LineSelectionControl
+          onCategoriesChange={(categories) => setSelectedCategories(categories)}
+          onPlanVersionChange={(version) => setSelectedPlanVersion(version)}
+          selectedCategories={selectedCategories}
+          selectedPlanVersion={selectedPlanVersion}
+        />
       </div>
     </div>
   );
