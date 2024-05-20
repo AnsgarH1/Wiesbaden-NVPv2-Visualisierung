@@ -2,7 +2,6 @@ import { useState } from "react";
 
 import { Layer, LngLat, Map, NavigationControl, Popup } from "react-map-gl";
 
-import { ToggleGroup, ToggleGroupItem } from "./components/ui/toggle-group";
 import { useTheme } from "./components/theme-provider";
 import { ModeToggle } from "./components/mode-toggle";
 
@@ -10,7 +9,6 @@ import "mapbox-gl/dist/mapbox-gl.css";
 
 import { Separator } from "./components/ui/separator";
 
-import { Switch } from "./components/ui/switch";
 import { LineMapSource } from "./components/LineMapSource";
 
 import { busLineData } from "./data";

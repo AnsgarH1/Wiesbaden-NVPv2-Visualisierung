@@ -1,4 +1,4 @@
-import { BusCategory, PlanVersion, SelectablePlanVersion } from "@/types";
+import { BusCategory, SelectablePlanVersion } from "@/types";
 import { ToggleGroup, ToggleGroupItem } from "./ui/toggle-group";
 import { Switch } from "./ui/switch";
 
