@@ -12,8 +12,9 @@ import { Separator } from "./components/ui/separator";
 import { LineMapSource } from "./components/LineMapSource";
 
 import { busLineData } from "./data";
-import { BusCategory, PlanVersion } from "./types";
+
 import { LineSelectionControl } from "./components/LineSelectionControl";
+import { useSelectedLines } from "./useLineSelection";
 
 function App() {
   const { theme } = useTheme();
@@ -23,71 +24,21 @@ function App() {
     lines: string[];
   } | null>(null);
 
-  const [selectedPlanVersion, setSelectedPlanVersion] = useState<
-    "v1" | "v2" | "both"
-  >("v2");
+  const {
+    visibleLines,
+    selectedCategories,
+    selectedLines,
+    selectLine,
+    deselectLine,
+    selectCategory,
+    deselectCategory,
+    selectedPlanVersion,
+    setPlanVersion,
+  } = useSelectedLines(busLineData);
 
-  const [selectedCategories, setSelectedCategories] = useState<BusCategory[]>([
-    BusCategory.EXPRESS,
-    BusCategory.METRO,
-    BusCategory.SPRINTER,
-    BusCategory.STADT,
-    BusCategory.QUARTIER,
-    BusCategory.REGIONAL,
-  ]);
-
-  const lineGroupsToDisplay = busLineData
-    .filter(
-      (lineGroup) =>
-        (selectedPlanVersion === "both" ||
-          lineGroup.planVersion ===
-            (selectedPlanVersion === "v1" ? PlanVersion.V1 : PlanVersion.V2)) &&
-        selectedCategories.includes(lineGroup.category)
-    )
-    .sort((b, a) => {
-      // sort by category -> metrobusses before express and sprinter busses, before rest
-      if (
-        a.category === BusCategory.METRO &&
-        b.category !== BusCategory.METRO
-      ) {
-        return -1;
-      }
-      if (
-        b.category === BusCategory.METRO &&
-        a.category !== BusCategory.METRO
-      ) {
-        return 1;
-      }
-      if (
-        a.category === BusCategory.EXPRESS &&
-        b.category !== BusCategory.EXPRESS
-      ) {
-        return -1;
-      }
-      if (
-        b.category === BusCategory.EXPRESS &&
-        a.category !== BusCategory.EXPRESS
-      ) {
-        return 1;
-      }
-      if (
-        a.category === BusCategory.SPRINTER &&
-        b.category !== BusCategory.SPRINTER
-      ) {
-        return -1;
-      }
-      if (
-        b.category === BusCategory.SPRINTER &&
-        a.category !== BusCategory.SPRINTER
-      ) {
-        return 1;
-      }
-      return 0;
-    });
-
-  const hoveredLines = lineGroupsToDisplay
-    .flatMap((lineGroup) => lineGroup.lines)
-    .filter((line) => hoverInfo?.lines.includes(line.id));
+  const hoveredLines = visibleLines.filter((line) =>
+    hoverInfo?.lines.includes(line.id)
+  );
   return (
     <div className="w-screen h-screen bg-white dark:bg-slate-800 flex flex-col lg:flex-row">
       <div className="flex-1 h-full w-full bg-green-400">
@@ -106,9 +57,7 @@ function App() {
               ? "mapbox://styles/mapbox/light-v11"
               : "mapbox://styles/mapbox/dark-v11"
           }
-          interactiveLayerIds={lineGroupsToDisplay
-            .flatMap((lineGroup) => lineGroup.lines)
-            .map((line) => line.id)}
+          interactiveLayerIds={visibleLines.map((line) => line.id)}
           onMouseMove={(e) => {
             if (e.features && e.features.length > 0) {
               const layerIds = e.features.map((f) => f.layer.id);
@@ -124,12 +73,10 @@ function App() {
         >
           <NavigationControl />
 
-          {lineGroupsToDisplay
-            .flatMap((lineGroup) => lineGroup.lines)
-            .map((line) => (
-              <LineMapSource key={line.id} line={line} />
-            ))}
-
+          <Layer id="top-layer" type="sky" />
+          {visibleLines.map((line) => (
+            <LineMapSource key={line.id} line={line} />
+          ))}
           {hoverInfo && hoveredLines && (
             <Popup
               longitude={hoverInfo.lnglat.lng}
@@ -145,7 +92,6 @@ function App() {
               ))}
             </Popup>
           )}
-          <Layer id="top-layer" type="sky" />
         </Map>
       </div>
 
@@ -156,10 +102,18 @@ function App() {
         </div>
         <Separator />
         <LineSelectionControl
-          onCategoriesChange={(categories) => setSelectedCategories(categories)}
-          onPlanVersionChange={(version) => setSelectedPlanVersion(version)}
+          allLines={{
+            v1: busLineData.filter(lineGroup=>lineGroup.planVersion === "v1"),
+            v2: busLineData.filter(lineGroup=>lineGroup.planVersion === "v2")
+          }}
+          selectedLines={selectedLines}
           selectedCategories={selectedCategories}
           selectedPlanVersion={selectedPlanVersion}
+          setPlanVersion={setPlanVersion}
+          selectLine={selectLine}
+          deselectLine={deselectLine}
+          selectCategory={selectCategory}
+          deselectCategory={deselectCategory}
         />
       </div>
     </div>

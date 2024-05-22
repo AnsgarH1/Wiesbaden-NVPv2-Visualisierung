@@ -1,62 +1,73 @@
-import { BusCategory, SelectablePlanVersion } from "@/types";
+import {
+  BusCategory,
+  Line,
+  LineGroup,
+  PlanVersion,
+  SelectablePlanVersion,
+  v1_Categories,
+  v2_Categories,
+} from "@/types";
 import { ToggleGroup, ToggleGroupItem } from "./ui/toggle-group";
 import { Switch } from "./ui/switch";
 
 type LineSelectionControlProps = {
+  allLines: { v1: LineGroup[]; v2: LineGroup[] };
+  selectedLines: Line[];
+  selectedCategories: BusCategory[];
   selectedPlanVersion: SelectablePlanVersion;
-  selectedCategories: Array<BusCategory>;
-  onPlanVersionChange: (planVersion: SelectablePlanVersion) => void;
-  onCategoriesChange: (category: Array<BusCategory>) => void;
+  selectLine: (lineId: string) => void;
+  deselectLine: (lineId: string) => void;
+  selectCategory: (category: BusCategory) => void;
+  deselectCategory: (category: BusCategory) => void;
+  setPlanVersion: (planVersion: SelectablePlanVersion) => void;
 };
 
 export const LineSelectionControl = ({
+  allLines,
+  selectedLines,
   selectedCategories,
   selectedPlanVersion,
-  onCategoriesChange,
-  onPlanVersionChange,
+  selectLine,
+  selectCategory,
+  deselectLine,
+  deselectCategory,
+  setPlanVersion,
 }: LineSelectionControlProps) => {
-  const handlePlanVersionChange = (value: string) => {
-    console.log(`new plan version: ${value}`);
-    onPlanVersionChange(value as SelectablePlanVersion);
+  const handlePlanVersionChange = (value: SelectablePlanVersion) => {
+    setPlanVersion(value);
   };
 
   const handleCategoryChange = (category: BusCategory, selected: boolean) => {
-    console.log(`category ${category} ${selected ? "selected" : "deselected"}`);
-    const newCategories = selected
-      ? [...selectedCategories, category]
-      : selectedCategories.filter((c) => c !== category);
-    onCategoriesChange(newCategories);
+    if (selected) {
+      selectCategory(category);
+    } else {
+      deselectCategory(category);
+    }
   };
 
-  const v1_Categories = [
-    BusCategory.METRO,
-    BusCategory.STADT,
-    BusCategory.QUARTIER,
-  ];
-
-  const v2_Categories = [
-    BusCategory.METRO,
-    BusCategory.EXPRESS,
-    BusCategory.SPRINTER,
-    BusCategory.STADT,
-    BusCategory.REGIONAL,
-  ];
+  const handleLineChange = (lineId: string, selected: boolean) => {
+    if (selected) {
+      selectLine(lineId);
+    } else {
+      deselectLine(lineId);
+    }
+  };
 
   return (
-    <div>
+    <div className="h-full overflow-y-scroll">
       <h2 className="text-wrap">Version auswählen</h2>
       <ToggleGroup
         type="single"
         onValueChange={handlePlanVersionChange}
         value={selectedPlanVersion}
       >
-        <ToggleGroupItem value={"v1" satisfies SelectablePlanVersion}>
+        <ToggleGroupItem value={PlanVersion.V1}>
           <p>Version 1</p>
         </ToggleGroupItem>
         <ToggleGroupItem value={"both" satisfies SelectablePlanVersion}>
           <p>Beide Versionen</p>
         </ToggleGroupItem>
-        <ToggleGroupItem value={"v2" satisfies SelectablePlanVersion}>
+        <ToggleGroupItem value={PlanVersion.V2}>
           <p>Version 2</p>
         </ToggleGroupItem>
       </ToggleGroup>
@@ -65,14 +76,32 @@ export const LineSelectionControl = ({
         {selectedPlanVersion === "v2" && (
           <div className="flex flex-col gap-2">
             {v2_Categories.map((category) => (
-              <div className="flex gap-3">
-                <Switch
-                  checked={selectedCategories.includes(category)}
-                  onCheckedChange={(checked) =>
-                    handleCategoryChange(category, checked)
-                  }
-                />
-                {category}
+              <div>
+                <div className="flex gap-3" key={category}>
+                  <Switch
+                    checked={selectedCategories.includes(category)}
+                    onCheckedChange={(checked) =>
+                      handleCategoryChange(category, checked)
+                    }
+                  />
+                  {category}
+                </div>
+                <div className="p-3">
+                  {allLines.v2
+                    .filter((lineGroup) => lineGroup.category === category)
+                    .flatMap((lineGroup) => lineGroup.lines)
+                    .map((line) => (
+                      <div  className="flex gap-3 pt-1">
+                        <Switch
+                          checked={selectedLines.includes(line)}
+                          onCheckedChange={(checked) =>
+                            handleLineChange(line.id, checked)
+                          }
+                        />
+                        {line.name}
+                      </div>
+                    ))}
+                </div>
               </div>
             ))}
           </div>
@@ -80,14 +109,32 @@ export const LineSelectionControl = ({
         {selectedPlanVersion === "v1" && (
           <div className="flex flex-col gap-2">
             {v1_Categories.map((category) => (
-              <div className="flex gap-3">
-                <Switch
-                  checked={selectedCategories.includes(category)}
-                  onCheckedChange={(checked) =>
-                    handleCategoryChange(category, checked)
-                  }
-                />
-                {category}
+              <div>
+                <div className="flex gap-3">
+                  <Switch
+                    checked={selectedCategories.includes(category)}
+                    onCheckedChange={(checked) =>
+                      handleCategoryChange(category, checked)
+                    }
+                  />
+                  {category}
+                </div>
+                <div className="p-3">
+                  {allLines.v1
+                    .filter((lineGroup) => lineGroup.category === category)
+                    .flatMap((lineGroup) => lineGroup.lines)
+                    .map((line) => (
+                      <div  className="flex gap-3">
+                        <Switch
+                          checked={selectedLines.includes(line)}
+                          onCheckedChange={(checked) =>
+                            handleLineChange(line.id, checked)
+                          }
+                        />
+                        {line.name}
+                      </div>
+                    ))}
+                </div>
               </div>
             ))}
           </div>

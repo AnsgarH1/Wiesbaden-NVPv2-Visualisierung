@@ -1,11 +1,11 @@
 import { Geometry } from "geojson";
 
 export enum PlanVersion {
-  V1 = "Oktober 2023",
-  V2 = "Mai 2024",
+  V1 = "v1",
+  V2 = "v2",
 }
 
-export type SelectablePlanVersion = "v1" | "both" | "v2";
+export type SelectablePlanVersion = PlanVersion.V1 | PlanVersion.V2 | "both";
 
 export enum BusCategory {
   METRO = "Metrobus",
@@ -37,3 +37,17 @@ export type LineGroup = {
   category: BusCategory;
   planVersion: PlanVersion;
 };
+
+export const v1_Categories = [
+  BusCategory.METRO,
+  BusCategory.STADT,
+  BusCategory.QUARTIER,
+];
+
+export const v2_Categories = [
+  BusCategory.METRO,
+  BusCategory.EXPRESS,
+  BusCategory.SPRINTER,
+  BusCategory.STADT,
+  BusCategory.REGIONAL,
+];

@@ -8,29 +8,17 @@ export const LineMapSource = ({ line }: { line: Line }) => {
   return (
     <Source
       key={`${line.id}-source`}
-      id={line.id}
+      id={`${line.id}-source`}
       type="geojson"
-      data={
-        line.routes.length === 1
-          ? line.routes[0].geometry
-          : {
-              type: "FeatureCollection",
-              features: line.routes.map((route) => ({
-                type: "Feature",
-                properties: {},
-                geometry: route.geometry,
-              })),
-            }
-      }
+      data={line.routes[0].geometry}
     >
       <Layer
-        beforeId={`top-layer`}
-        id={line.id}
+        beforeId="top-layer"
+        id={`${line.id}-line`}
         type="line"
         layout={{
           "line-join": "round",
           "line-cap": "round",
-          "line-miter-limit": 10,
         }}
         paint={getLinePaint(line)}
       />
@@ -39,16 +27,18 @@ export const LineMapSource = ({ line }: { line: Line }) => {
           type="symbol"
           id={`${line.id}-label`}
           layout={{
-            "text-field":  line.name,
+            "text-field": line.name,
             "symbol-placement": "line",
             "symbol-spacing": 100,
-            "text-size": 14,
+            "text-size": 10,
             "text-anchor": "center",
+            "icon-allow-overlap": true,
+            "text-allow-overlap": true,
           }}
           paint={{
             "text-color": theme === "light" ? "#000" : "#fff",
             "text-halo-color": theme === "light" ? "#fff" : "#000",
-            "text-halo-width": 3,
+            "text-halo-width": 2,
           }}
         />
       )}

@@ -63,12 +63,12 @@ const expressBusHexColors = [
   "#047857",
 ];
 
-function getLineNumberByLineName(lineName: string): number | undefined {
+function getLineNumberByLineName(lineName: string): number {
   const numberResults = lineName.match(/\d+/);
   if (numberResults) {
     return parseInt(numberResults[0]);
   }
-  return undefined;
+  return 0;
 }
 
 //get the color of standard bus by line number hash
@@ -96,18 +96,13 @@ function getMetroBusColor(lineName: string): string {
   return color;
 }
 
-const getOffsetByLineNumber = (lineName: string): number => {
-  const lineNumber = getLineNumberByLineName(lineName) || 4;
-  return (lineNumber * 1) % 8;
-};
-
 export const getLinePaint = (line: Line): LinePaint => {
   switch (line.category) {
     case BusCategory.METRO:
       return {
         "line-color": getMetroBusColor(line.lineName || line.name),
         "line-width": 3,
-        "line-offset": getOffsetByLineNumber(line.lineName || line.name),
+        "line-offset": getLineNumberByLineName(line.name),
       };
     case BusCategory.EXPRESS:
     case BusCategory.REGIONAL:
@@ -115,8 +110,7 @@ export const getLinePaint = (line: Line): LinePaint => {
         "line-color": getExpressBusColor(line.lineName || line.name),
 
         "line-width": 2,
-        "line-dasharray": [5, 3],
-        "line-offset": getOffsetByLineNumber(line.lineName || line.name),
+        "line-offset": getLineNumberByLineName(line.name) % 4,
       };
     default:
       return {
@@ -124,7 +118,7 @@ export const getLinePaint = (line: Line): LinePaint => {
 
         "line-width": 2,
         "line-dasharray": [2, 2],
-        "line-offset": getOffsetByLineNumber(line.lineName || line.name),
+        "line-offset": getLineNumberByLineName(line.lineName || line.name) % 4,
       };
   }
 };
