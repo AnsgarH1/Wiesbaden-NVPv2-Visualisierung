@@ -27,6 +27,7 @@ export type Line = {
   id: string;
   name: string;
   lineName?: string;
+  planVersion?: PlanVersion; // should have added this from the start, TODO: Refactor all lines
   category: BusCategory;
   routes: Route[];
 };

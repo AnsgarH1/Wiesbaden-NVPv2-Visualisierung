@@ -1,6 +1,13 @@
-import { useState } from "react";
+import { useEffect, useReducer, useState } from "react";
 
-import { Layer, LngLat, Map, NavigationControl, Popup } from "react-map-gl";
+import {
+  Layer,
+  LngLat,
+  Map,
+  NavigationControl,
+  Popup,
+  useMap,
+} from "react-map-gl";
 
 import { useTheme } from "./components/theme-provider";
 import { ModeToggle } from "./components/mode-toggle";
@@ -15,6 +22,9 @@ import { busLineData } from "./data";
 
 import { LineSelectionControl } from "./components/LineSelectionControl";
 import { useSelectedLines } from "./useLineSelection";
+import { Switch } from "./components/ui/switch";
+import { Button } from "./components/ui/button";
+import { Menu, X } from "lucide-react";
 
 function App() {
   const { theme } = useTheme();
@@ -24,6 +34,14 @@ function App() {
     lines: string[];
   } | null>(null);
 
+  const map = useMap();
+  const [showMenu, toggleMenu] = useReducer((val) => !val, true);
+  useEffect(() => {
+    map.map?.resize();
+    console.log("map resized!", map.map);
+  }, [showMenu, map]);
+
+  const [showLineNames, setShowLineNames] = useState(true);
   const {
     visibleLines,
     selectedCategories,
@@ -40,8 +58,8 @@ function App() {
     hoverInfo?.lines.includes(line.id)
   );
   return (
-    <div className="w-screen h-screen bg-white dark:bg-slate-800 flex flex-col lg:flex-row">
-      <div className="flex-1 h-full w-full bg-green-400">
+    <div className="w-screen h-screen bg-white dark:bg-slate-800 flex flex-row">
+      <div className="flex flex-1 h-full w-ful">
         <Map
           id="map"
           mapboxAccessToken={import.meta.env.VITE_PUBLIC_MAPBOX_TOKEN}
@@ -71,11 +89,16 @@ function App() {
             }
           }}
         >
-          <NavigationControl />
+          <NavigationControl position="top-left" />
 
           <Layer id="top-layer" type="sky" />
           {visibleLines.map((line) => (
-            <LineMapSource key={line.id} line={line} />
+            <LineMapSource
+              key={line.id}
+              line={line}
+              showLineName={showLineNames}
+              selectedPlanVersion={selectedPlanVersion}
+            />
           ))}
           {hoverInfo && hoveredLines && (
             <Popup
@@ -94,28 +117,56 @@ function App() {
           )}
         </Map>
       </div>
-
-      <div className="p-3  flex gap-3 flex-col items-center">
-        <div className="flex gap-10 items-center">
-          <h3 className="text-lg ">Ansicht konfigurieren</h3>
-          <ModeToggle />
+      {showMenu ? (
+        <div className="p-3  basis-1/3 flex gap-3 flex-col items-center">
+          <div className="flex flex-col w-full h-full  justify-between gap-3">
+            <div className="flex gap-10 justify-between items-center w-full">
+              <ModeToggle />
+              <h1 className="text-lg font-bold ">Ansicht konfigurieren</h1>
+              <Button
+                variant="outline"
+                size="icon"
+                aria-label="Menü schließen"
+                onClick={toggleMenu}
+              >
+                <X />
+              </Button>
+            </div>
+            <Separator />
+            <LineSelectionControl
+              allLines={{
+                v1: busLineData.filter(
+                  (lineGroup) => lineGroup.planVersion === "v1"
+                ),
+                v2: busLineData.filter(
+                  (lineGroup) => lineGroup.planVersion === "v2"
+                ),
+              }}
+              selectedLines={selectedLines}
+              selectedCategories={selectedCategories}
+              selectedPlanVersion={selectedPlanVersion}
+              setPlanVersion={setPlanVersion}
+              selectLine={selectLine}
+              deselectLine={deselectLine}
+              selectCategory={selectCategory}
+              deselectCategory={deselectCategory}
+            />
+          </div>
+          <div className="flex  gap-3 w-full">
+            <Switch
+              checked={showLineNames}
+              onCheckedChange={setShowLineNames}
+            />
+            <p>Liniennamen auf Karte anzeigen</p>
+          </div>
         </div>
-        <Separator />
-        <LineSelectionControl
-          allLines={{
-            v1: busLineData.filter(lineGroup=>lineGroup.planVersion === "v1"),
-            v2: busLineData.filter(lineGroup=>lineGroup.planVersion === "v2")
-          }}
-          selectedLines={selectedLines}
-          selectedCategories={selectedCategories}
-          selectedPlanVersion={selectedPlanVersion}
-          setPlanVersion={setPlanVersion}
-          selectLine={selectLine}
-          deselectLine={deselectLine}
-          selectCategory={selectCategory}
-          deselectCategory={deselectCategory}
-        />
-      </div>
+      ) : (
+        <div className="absolute top-3 right-3">
+          <Button size="icon" onClick={toggleMenu}>
+            <Menu />
+          </Button>
+        </div>
+      )}
     </div>
   );
 }

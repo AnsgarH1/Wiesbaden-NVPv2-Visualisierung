@@ -1,10 +1,19 @@
 import { getLinePaint } from "@/lib/getBusLineColor";
-import { Line } from "@/types";
+import { Line, PlanVersion, SelectablePlanVersion } from "@/types";
 import { Layer, Source } from "react-map-gl";
 import { useTheme } from "./theme-provider";
 
-export const LineMapSource = ({ line }: { line: Line }) => {
+export const LineMapSource = ({
+  line,
+  showLineName,
+  selectedPlanVersion,
+}: {
+  line: Line;
+  showLineName: boolean
+  selectedPlanVersion: SelectablePlanVersion;
+}) => {
   const { theme } = useTheme();
+
   return (
     <Source
       key={`${line.id}-source`}
@@ -20,20 +29,19 @@ export const LineMapSource = ({ line }: { line: Line }) => {
           "line-join": "round",
           "line-cap": "round",
         }}
-        paint={getLinePaint(line)}
+        paint={getLinePaint(line, selectedPlanVersion == "both")}
       />
-      {line.lineName && (
+      {showLineName && line.lineName && (
         <Layer
           type="symbol"
           id={`${line.id}-label`}
           layout={{
             "text-field": line.name,
             "symbol-placement": "line",
-            "symbol-spacing": 100,
-            "text-size": 10,
-            "text-anchor": "center",
-            "icon-allow-overlap": true,
-            "text-allow-overlap": true,
+            "symbol-spacing": 50,
+            "text-size": 12,
+            "text-ignore-placement": false,
+            "symbol-avoid-edges": true,
           }}
           paint={{
             "text-color": theme === "light" ? "#000" : "#fff",

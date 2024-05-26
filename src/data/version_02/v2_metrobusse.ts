@@ -1,10 +1,12 @@
-import { BusCategory, Line } from "@/types";
+import { BusCategory, Line, PlanVersion } from "@/types";
 
 export const v2_metroBusse: Line[] = [
   {
     category: BusCategory.METRO,
     id: "g2Mzc",
     name: "M7 Mainz Kastel <> Klarenthal",
+
+    planVersion: PlanVersion.V2,
     lineName: "M7",
     routes: [
       {
@@ -370,6 +372,7 @@ export const v2_metroBusse: Line[] = [
     id: "c2MTk",
     name: "M6 Nordfriedhof <> Mainz",
     lineName: "M6",
+    planVersion: PlanVersion.V2,
     routes: [
       {
         geometry: {
@@ -930,6 +933,7 @@ export const v2_metroBusse: Line[] = [
     id: "QzMzY",
     name: "M5 Südfriedhof <> Dotzheim",
     lineName: "M5",
+    planVersion: PlanVersion.V2,
     routes: [
       {
         geometry: {
@@ -1194,6 +1198,7 @@ export const v2_metroBusse: Line[] = [
     id: "Q4NjA",
     name: "M4_Biebrich <> Klarenthal",
     lineName: "M4",
+    planVersion: PlanVersion.V2,
     routes: [
       {
         geometry: {
@@ -2050,6 +2055,7 @@ export const v2_metroBusse: Line[] = [
     id: "k1MTI",
     name: "M3 Biebrich <> Dotzheim",
     lineName: "M3",
+    planVersion: PlanVersion.V2,
     routes: [
       {
         geometry: {
@@ -2398,6 +2404,7 @@ export const v2_metroBusse: Line[] = [
     id: "I5MzA",
     name: "M2 Wallau <> Klarenthal",
     lineName: "M2",
+    planVersion: PlanVersion.V2,
     routes: [
       {
         geometry: {
@@ -2859,6 +2866,7 @@ export const v2_metroBusse: Line[] = [
     id: "k3MTc",
     name: "M1 Bierstadt <> Schierstein",
     lineName: "M1",
+    planVersion: PlanVersion.V2,
     routes: [
       {
         geometry: {

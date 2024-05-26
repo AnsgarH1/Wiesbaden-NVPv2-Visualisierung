@@ -8,14 +8,32 @@ import {
 } from "./types";
 
 export const useSelectedLines = (initialLineGroups: LineGroup[]) => {
+  type State = { [key in SelectablePlanVersion]: string[] };
+
+  const initialState: State = {
+    v1: initialLineGroups
+      .filter(
+        (lineGroup) =>
+          lineGroup.planVersion === PlanVersion.V1 &&
+          lineGroup.category === BusCategory.METRO
+      )
+      .flatMap((lineGroup) => lineGroup.lines)
+      .map((line) => line.id),
+    v2: initialLineGroups
+      .filter(
+        (lineGroup) =>
+          lineGroup.planVersion === PlanVersion.V2 &&
+          lineGroup.category === BusCategory.METRO
+      )
+      .flatMap((lineGroup) => lineGroup.lines)
+      .map((line) => line.id),
+    both: initialLineGroups
+      .filter((lineGroup) => lineGroup.category === BusCategory.METRO)
+      .flatMap((lineGroup) => lineGroup.lines)
+      .map((line) => line.id),
+  };
   const [selectedLineIdsByPlanVersion, setSelectedLineIdsByPlanVersion] =
-    useState<{
-      [key in SelectablePlanVersion]: string[];
-    }>({
-      v1: [],
-      v2: [],
-      both: [],
-    });
+    useState<State>(initialState);
 
   const [selectedPlanVersion, setSelectedPlanVersion] =
     useState<SelectablePlanVersion>(PlanVersion.V2);
@@ -100,7 +118,11 @@ export const useSelectedLines = (initialLineGroups: LineGroup[]) => {
     .filter((line): line is Line => line !== undefined);
 
   const visibleLines: Line[] = initialLineGroups
-    .filter((lineGroup) => lineGroup.planVersion === selectedPlanVersion)
+    .filter((lineGroup) =>
+      selectedPlanVersion !== "both"
+        ? lineGroup.planVersion === selectedPlanVersion
+        : true
+    )
     .flatMap((lineGroup) =>
       lineGroup.lines.filter((line) =>
         selectedLineIdsByPlanVersion[selectedPlanVersion].includes(line.id)

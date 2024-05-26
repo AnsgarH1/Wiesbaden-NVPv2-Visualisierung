@@ -5332,7 +5332,7 @@ export const v2_stadtbusse: Line[] = [
   },
   {
     category: BusCategory.STADT,
-    id: "Y5Mzc",
+    id: "Y5MzcABC",
     name: "16 Schierstein <> Bierstadt",
     lineName: "16",
     routes: [
@@ -5577,7 +5577,7 @@ export const v2_stadtbusse: Line[] = [
             ],
           ],
         },
-        id: "Y5Mzc",
+        id: "Y5MzcABC",
         direction: "OUTBOUND",
       },
       {

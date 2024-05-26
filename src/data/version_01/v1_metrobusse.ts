@@ -1,10 +1,11 @@
-import { BusCategory, Line } from "@/types";
+import { BusCategory, Line, PlanVersion } from "@/types";
 
 export const v1_metroBusse: Line[] = [
   {
     category: BusCategory.METRO,
     id: "Y5Mzc",
     name: "M1 Schelmengraben <> Bierstadt-Nord",
+    planVersion: PlanVersion.V1,
     routes: [
       {
         geometry: {
@@ -227,6 +228,8 @@ export const v1_metroBusse: Line[] = [
     category: BusCategory.METRO,
     id: "M3NzU",
     name: "M2 (Bierstadt Fliednerschule <> Schierstein Oderstraße)",
+
+    planVersion: PlanVersion.V1,
     routes: [
       {
         geometry: {
@@ -350,6 +353,7 @@ export const v1_metroBusse: Line[] = [
     category: BusCategory.METRO,
     id: "k3OTU",
     name: "M4 (Nordfriedhof <> Biebrich Rheinufer)",
+    planVersion: PlanVersion.V1,
     routes: [
       {
         geometry: {
@@ -437,6 +441,7 @@ export const v1_metroBusse: Line[] = [
     category: BusCategory.METRO,
     id: "g1MTI",
     name: "M5 (Äppelallee-Center <> Wallau/Delkenheim Bf)",
+    planVersion: PlanVersion.V1,
     routes: [
       {
         geometry: {
@@ -663,6 +668,7 @@ export const v1_metroBusse: Line[] = [
     category: BusCategory.METRO,
     id: "AxMDY",
     name: "M5 Klarenthal <> Äppelallee-Center",
+    planVersion: PlanVersion.V1,
     routes: [
       {
         geometry: {
@@ -861,6 +867,7 @@ export const v1_metroBusse: Line[] = [
     category: BusCategory.METRO,
     id: "gxNzE",
     name: "M6 Klarenthal <> Mz-Gonsenheim",
+    planVersion: PlanVersion.V1,
     routes: [
       {
         geometry: {
@@ -1182,6 +1189,7 @@ export const v1_metroBusse: Line[] = [
     category: BusCategory.METRO,
     id: "Y3Mjk",
     name: "M7 Sonnenberg <> Gustavsburg",
+    planVersion: PlanVersion.V1,
     routes: [
       {
         geometry: {
@@ -1379,6 +1387,7 @@ export const v1_metroBusse: Line[] = [
     category: BusCategory.METRO,
     id: "MwNjU",
     name: "M8 (Helios HSK <> Mainz-Münchfeld)",
+    planVersion: PlanVersion.V1,
     routes: [
       {
         geometry: {
@@ -1713,6 +1722,7 @@ export const v1_metroBusse: Line[] = [
     category: BusCategory.METRO,
     id: "M4OTU",
     name: "M9 Nordfriedhof <> Erbenheim",
+    planVersion: PlanVersion.V1,
     routes: [
       {
         geometry: {
