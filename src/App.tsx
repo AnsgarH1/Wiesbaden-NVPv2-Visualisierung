@@ -26,20 +26,25 @@ import { Switch } from "./components/ui/switch";
 import { Button } from "./components/ui/button";
 import { Menu, X } from "lucide-react";
 
+
+
 function App() {
   const { theme } = useTheme();
 
   const [hoverInfo, setHoverInfo] = useState<{
     lnglat: LngLat;
-    lines: string[];
+    lineLayerIds: string[];
   } | null>(null);
 
   const map = useMap();
   const [showMenu, toggleMenu] = useReducer((val) => !val, true);
   useEffect(() => {
     map.map?.resize();
-    console.log("map resized!", map.map);
   }, [showMenu, map]);
+
+  useEffect(() => {
+    console.log();
+  }, [map]);
 
   const [showLineNames, setShowLineNames] = useState(true);
   const {
@@ -54,9 +59,10 @@ function App() {
     setPlanVersion,
   } = useSelectedLines(busLineData);
 
-  const hoveredLines = visibleLines.filter((line) =>
-    hoverInfo?.lines.includes(line.id)
+  const hoveredOverLines = visibleLines.filter((line) =>
+    hoverInfo?.lineLayerIds.some((layerId) => layerId.includes(line.id))
   );
+
   return (
     <div className="w-screen h-screen bg-white dark:bg-slate-800 flex flex-row">
       <div className="flex flex-1 h-full w-ful">
@@ -70,19 +76,20 @@ function App() {
           }}
           reuseMaps
           style={{ height: "100%", width: "100%" }}
+          onMoveEnd={(e) => console.log(e.target.getZoom())}
           mapStyle={
             theme === "light"
               ? "mapbox://styles/mapbox/light-v11"
               : "mapbox://styles/mapbox/dark-v11"
           }
-          interactiveLayerIds={visibleLines.map((line) => line.id)}
+          interactiveLayerIds={visibleLines.map((line) => `${line.id}-line`)}
           onMouseMove={(e) => {
             if (e.features && e.features.length > 0) {
               const layerIds = e.features.map((f) => f.layer.id);
 
               setHoverInfo({
                 lnglat: e.lngLat,
-                lines: layerIds,
+                lineLayerIds: layerIds,
               });
             } else {
               setHoverInfo(null);
@@ -100,7 +107,7 @@ function App() {
               selectedPlanVersion={selectedPlanVersion}
             />
           ))}
-          {hoverInfo && hoveredLines && (
+          {hoverInfo && hoveredOverLines && (
             <Popup
               longitude={hoverInfo.lnglat.lng}
               latitude={hoverInfo.lnglat.lat}
@@ -108,8 +115,8 @@ function App() {
               maxWidth="700px"
               closeButton={false}
             >
-              {hoveredLines.map((line) => (
-                <p key={line.id} className="text-nowrap text-md font-semibold">
+              {hoveredOverLines.map((line) => (
+                <p key={line.id} className="text-nowrap ">
                   {line.name}
                 </p>
               ))}
