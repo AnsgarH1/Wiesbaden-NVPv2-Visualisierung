@@ -1,4 +1,4 @@
-import { BusCategory, Line, PlanVersion, SelectablePlanVersion } from "@/types";
+import { BusCategory, Line, PlanVersion } from "@/types";
 import { LinePaint } from "mapbox-gl";
 
 const standardHexColors = [

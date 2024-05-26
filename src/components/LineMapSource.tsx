@@ -1,5 +1,5 @@
 import { getLinePaint } from "@/lib/getBusLineColor";
-import { Line, PlanVersion, SelectablePlanVersion } from "@/types";
+import { Line, SelectablePlanVersion } from "@/types";
 import { Layer, Source } from "react-map-gl";
 import { useTheme } from "./theme-provider";
 

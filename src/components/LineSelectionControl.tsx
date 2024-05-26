@@ -4,8 +4,6 @@ import {
   LineGroup,
   PlanVersion,
   SelectablePlanVersion,
-  v1_Categories,
-  v2_Categories,
 } from "@/types";
 import { ToggleGroup, ToggleGroupItem } from "./ui/toggle-group";
 import { Switch } from "./ui/switch";
@@ -14,8 +12,7 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "./ui/collapsible";
-import { Bus, ChevronDown } from "lucide-react";
-import { Button } from "./ui/button";
+import {  ChevronDown } from "lucide-react";
 import { lineGroupSort, lineSort } from "@/lib/utils";
 import { getLineColorByLineNameAndCategory } from "@/lib/getBusLineColor";
 import { Separator } from "./ui/separator";
