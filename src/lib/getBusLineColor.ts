@@ -94,14 +94,14 @@ export const getLinePaint = (
   if (distinctVersion) {
     if (line.planVersion == PlanVersion.V1) {
       return {
-        "line-color": "#b91c1c",
-        "line-width": 4,
+        "line-color": "#94a3b8",
+        "line-width": 2,
         "line-dasharray": [2, 2],
       };
     } else {
       return {
-        "line-color": "#1e40af",
-        "line-width": 5,
+        "line-color": "#64748b",
+        "line-width": 4,
       };
     }
   } else {

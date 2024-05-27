@@ -39,6 +39,13 @@ export type LineGroup = {
   planVersion: PlanVersion;
 };
 
+export type Stop = {
+  id: string;
+  name: string;
+  planVersion: PlanVersion;
+  geometry: { type: "Point"; coordinates: [number, number] };
+};
+
 export const v1_Categories = [
   BusCategory.METRO,
   BusCategory.STADT,

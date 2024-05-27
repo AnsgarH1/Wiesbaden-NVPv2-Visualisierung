@@ -78,7 +78,7 @@ export const LineSelectionControl = ({
   }
 
   return (
-    <div className="h-full overflow-y-scroll">
+    <div className="h-full">
       <h2 className="text-lg font-bold">Version auswählen</h2>
       <ToggleGroup
         type="single"

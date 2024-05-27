@@ -4,6 +4,7 @@ import {
   Layer,
   LngLat,
   Map,
+  Marker,
   NavigationControl,
   Popup,
   useMap,
@@ -24,9 +25,12 @@ import { LineSelectionControl } from "./components/LineSelectionControl";
 import { useSelectedLines } from "./useLineSelection";
 import { Switch } from "./components/ui/switch";
 import { Button } from "./components/ui/button";
-import { Menu, X } from "lucide-react";
+import { MapPin, Menu, X } from "lucide-react";
+import { PlanVersion, Stop } from "./types";
+import { v1_stops } from "./data/version_01/v1_stops";
+import { v2_stops } from "./data/version_02/v2_stops";
 
-
+const INITIAL_MAP_ZOOM = 12;
 
 function App() {
   const { theme } = useTheme();
@@ -37,16 +41,15 @@ function App() {
   } | null>(null);
 
   const map = useMap();
+
   const [showMenu, toggleMenu] = useReducer((val) => !val, true);
   useEffect(() => {
     map.map?.resize();
   }, [showMenu, map]);
-
-  useEffect(() => {
-    console.log();
-  }, [map]);
+  const [mapZoom, setMapZoom] = useState(INITIAL_MAP_ZOOM);
 
   const [showLineNames, setShowLineNames] = useState(true);
+  const [showStops, setShowStops] = useState(false);
   const {
     visibleLines,
     selectedCategories,
@@ -63,6 +66,12 @@ function App() {
     hoverInfo?.lineLayerIds.some((layerId) => layerId.includes(line.id))
   );
 
+  const stopsToDisplay: Stop[] = showStops
+    ? selectedPlanVersion === PlanVersion.V1
+      ? v1_stops
+      : v2_stops
+    : [];
+
   return (
     <div className="w-screen h-screen bg-white dark:bg-slate-800 flex flex-row">
       <div className="flex flex-1 h-full w-ful">
@@ -72,11 +81,11 @@ function App() {
           initialViewState={{
             longitude: 8.24178,
             latitude: 50.0817,
-            zoom: 12,
+            zoom: INITIAL_MAP_ZOOM,
           }}
           reuseMaps
+          onZoomEnd={(e) => setMapZoom(e.target.getZoom())}
           style={{ height: "100%", width: "100%" }}
-          onMoveEnd={(e) => console.log(e.target.getZoom())}
           mapStyle={
             theme === "light"
               ? "mapbox://styles/mapbox/light-v11"
@@ -122,11 +131,27 @@ function App() {
               ))}
             </Popup>
           )}
+          {stopsToDisplay.map((stop) => (
+            <Marker
+              latitude={stop.geometry.coordinates[1]}
+              longitude={stop.geometry.coordinates[0]}
+              key={stop.id}
+              anchor="bottom"
+            >
+              <div className="flex justify-center flex-col items-center">
+                {mapZoom > 14 && <p>{stop.name}</p>}
+                <MapPin
+                  size={mapZoom > 14 ? 24 : 16}
+                  color={theme === "light" ? "#4b4b4b" : "#a7a7a7"}
+                />
+              </div>
+            </Marker>
+          ))}
         </Map>
       </div>
       {showMenu ? (
-        <div className="p-3  basis-1/3 flex gap-3 flex-col items-center">
-          <div className="flex flex-col w-full h-full  justify-between gap-3">
+        <div className="p-3  flex flex-col justify-between basis-1/3 gap-3  items-center  w-full h-full overflow-y-auto">
+          <div className="flex flex-col justify-between gap-3 w-full">
             <div className="flex gap-10 justify-between items-center w-full">
               <ModeToggle />
               <h1 className="text-lg font-bold ">Ansicht konfigurieren</h1>
@@ -159,12 +184,18 @@ function App() {
               deselectCategory={deselectCategory}
             />
           </div>
-          <div className="flex  gap-3 w-full">
-            <Switch
-              checked={showLineNames}
-              onCheckedChange={setShowLineNames}
-            />
-            <p>Liniennamen auf Karte anzeigen</p>
+          <div className="flex flex-col gap-3 w-full">
+            <div className="flex  gap-3 w-full">
+              <Switch checked={showStops} onCheckedChange={setShowStops} />
+              <p>Haltstellen anzeigen</p>
+            </div>
+            <div className="flex  gap-3 w-full">
+              <Switch
+                checked={showLineNames}
+                onCheckedChange={setShowLineNames}
+              />
+              <p>Liniennamen auf Karte anzeigen</p>
+            </div>
           </div>
         </div>
       ) : (
