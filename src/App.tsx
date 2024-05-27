@@ -150,7 +150,7 @@ function App() {
         </Map>
       </div>
       {showMenu ? (
-        <div className="p-3  flex flex-col justify-between basis-1/3 gap-3  items-center  w-full h-full overflow-y-auto">
+        <div className="p-3  flex flex-col justify-between  w-96  items-center min-w-12 h-full overflow-y-auto">
           <div className="flex flex-col justify-between gap-3 w-full">
             <div className="flex gap-10 justify-between items-center w-full">
               <ModeToggle />
