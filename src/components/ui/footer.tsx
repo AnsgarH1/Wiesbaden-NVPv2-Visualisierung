@@ -6,7 +6,7 @@ import GithubIcon from "@/assets/github-mark.svg?react";
 
 export const Footer = () => (
   <div className=" bg-primary text-white dark:bg-background flex  justify-between items-center px-5">
-    <a href="https://www.wiesbaden-neu-bewegen.de">
+    <a href="https://www.wiesbaden-neu-bewegen.de" target="_blank">
       <WnbLogoTextSvg className="h-16 w-auto py-3 hidden lg:block" />
       <WnbLogoSvg className="h-16 w-auto py-3 lg:hidden" />
     </a>
@@ -15,18 +15,23 @@ export const Footer = () => (
     </h1>
     <div className="flex gap-5">
       <a
+        target="_blank"
         href="https://wiesbaden-neu-bewegen.de/impressum/"
         className="underline"
       >
         Impressum
       </a>
       <a
+        target="_blank"
         href="https://wiesbaden-neu-bewegen.de/datenschutz/"
         className="underline"
       >
         Datenschutz
       </a>
-      <a href="https://github.com/AnsgarH1/Wiesbaden-NVPv2-Visualisierung">
+      <a
+        target="_blank"
+        href="https://github.com/AnsgarH1/Wiesbaden-NVPv2-Visualisierung"
+      >
         <div className="flex justify-center items-center  gap-2 underline ">
           <GithubIcon className="h-4 w-auto fill-white" />
           GitHub
