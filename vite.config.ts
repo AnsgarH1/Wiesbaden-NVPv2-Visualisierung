@@ -9,7 +9,7 @@ export default defineConfig({
     include: "**/*.svg?react",
   }), sentryVitePlugin({
     org: "ansgar-hoyer",
-    project: "javascript-react"
+    project: "nvp-visualisierung"
   })],
 
   resolve: {
