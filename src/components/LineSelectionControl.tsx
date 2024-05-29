@@ -12,7 +12,7 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "./ui/collapsible";
-import {  ChevronDown } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 import { lineGroupSort, lineSort } from "@/lib/utils";
 import { getLineColorByLineNameAndCategory } from "@/lib/getBusLineColor";
 import { Separator } from "./ui/separator";
@@ -115,6 +115,7 @@ export const LineSelectionControl = ({
                       key={line.id}
                     >
                       <Switch
+                        color="#e3f434"
                         checked={selectedLines.includes(line)}
                         onCheckedChange={(checked) =>
                           handleLineChange(line.id, checked)
@@ -138,6 +139,7 @@ export const LineSelectionControl = ({
                       key={line.id}
                     >
                       <Switch
+                        color={"#004970"}
                         checked={selectedLines.includes(line)}
                         onCheckedChange={(checked) =>
                           handleLineChange(line.id, checked)

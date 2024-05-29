@@ -1,4 +1,4 @@
-/// <reference types="vite-plugin-svgr/client" />
+
 import { useEffect, useReducer, useState } from "react";
 
 import {
@@ -10,51 +10,33 @@ import {
   Popup,
   useMap,
 } from "react-map-gl";
-
-import { useTheme } from "./components/theme-provider";
-import { ModeToggle } from "./components/mode-toggle";
-
 import "mapbox-gl/dist/mapbox-gl.css";
 
-import WnbLogoSvg from "@/assets/wnb-logo.svg?react";
-import GithubIcon from "@/assets/github-mark.svg?react";
-
-import { Separator } from "./components/ui/separator";
-
-import { LineMapSource } from "./components/LineMapSource";
-
-import { busLineData } from "./data";
+import { MapPin, Menu } from "lucide-react";
 
 import { LineSelectionControl } from "./components/LineSelectionControl";
-import { useSelectedLines } from "./useLineSelection";
-import { Switch } from "./components/ui/switch";
+import { StopSelectionControl } from "./components/StopSelectionControl";
+import { MenuControl } from "./components/MenuControl";
+
+import { useTheme } from "./components/theme-provider";
+import { LineMapSource } from "./components/LineMapSource";
+
 import { Button } from "./components/ui/button";
-import {  MapPin, Menu, X } from "lucide-react";
+import { Separator } from "./components/ui/separator";
+
 import { PlanVersion, Stop } from "./types";
-import { v1_stops } from "./data/version_01/v1_stops";
-import { v2_stops } from "./data/version_02/v2_stops";
+import { useSelectedLines } from "./useLineSelection";
+
+import { busLineData, v1_stops, v2_stops } from "./data";
+import { Footer } from "./components/ui/footer";
 
 const INITIAL_MAP_ZOOM = 12;
 
 function App() {
+  /** hooks initialization */
   const { theme } = useTheme();
-
- 
-  const [hoverInfo, setHoverInfo] = useState<{
-    lnglat: LngLat;
-    lineLayerIds: string[];
-  } | null>(null);
-
   const map = useMap();
 
-  const [showMenu, toggleMenu] = useReducer((val) => !val, true);
-  useEffect(() => {
-    map.map?.resize();
-  }, [showMenu, map]);
-  const [mapZoom, setMapZoom] = useState(INITIAL_MAP_ZOOM);
-
-  const [showLineNames, setShowLineNames] = useState(true);
-  const [showStops, setShowStops] = useState(false);
   const {
     visibleLines,
     selectedCategories,
@@ -67,10 +49,28 @@ function App() {
     setPlanVersion,
   } = useSelectedLines(busLineData);
 
+  /** Setting State */
+  const [hoverInfo, setHoverInfo] = useState<{
+    lnglat: LngLat;
+    lineLayerIds: string[];
+  } | null>(null);
+
+  const [showMenu, toggleMenu] = useReducer((val) => !val, true);
+
+  const [mapZoom, setMapZoom] = useState(INITIAL_MAP_ZOOM);
+
+  const [showLineNames, setShowLineNames] = useState(true);
+  const [showStops, setShowStops] = useState(false);
+
+  /** the one effect we need */
+  useEffect(() => {
+    map.map?.resize();
+  }, [showMenu, map]);
+
+  /** Calculated values / derived state */
   const hoveredOverLines = visibleLines.filter((line) =>
     hoverInfo?.lineLayerIds.some((layerId) => layerId.includes(line.id))
   );
-
 
   const stopsToDisplay: Stop[] = showStops
     ? selectedPlanVersion === PlanVersion.V1
@@ -81,7 +81,7 @@ function App() {
   return (
     <div className="w-screen h-screen bg-background ">
       <div className="flex flex-col h-full w-full ">
-        <div className="flex-1 flex overflow-hidden border-b-slate-700">
+        <div className="flex-1 flex overflow-hidden shadow-lg shadow-slate-100" >
           <div className="flex-1  ">
             <Map
               id="map"
@@ -160,20 +160,9 @@ function App() {
             </Map>
           </div>
           {showMenu ? (
-            <div className="p-3  flex flex-col justify-between bg-popover  w-96  items-center min-w-12 overflow-y-auto">
+            <div className="p-3  flex flex-col justify-between   w-96  items-center min-w-12 overflow-y-auto">
               <div className="flex flex-col gap-3 w-full">
-                <div className="flex gap-10 justify-between items-center w-full">
-                  <ModeToggle />
-                  <h1 className="text-lg font-bold ">Ansicht konfigurieren</h1>
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    aria-label="Menü schließen"
-                    onClick={toggleMenu}
-                  >
-                    <X />
-                  </Button>
-                </div>
+                <MenuControl toggleMenu={toggleMenu} />
                 <Separator />
                 <LineSelectionControl
                   allLines={{
@@ -194,19 +183,12 @@ function App() {
                   deselectCategory={deselectCategory}
                 />
               </div>
-              <div className="flex flex-col py-3 gap-3 w-full">
-                <div className="flex  gap-3 w-full">
-                  <Switch checked={showStops} onCheckedChange={setShowStops} />
-                  <p>Haltstellen anzeigen</p>
-                </div>
-                <div className="flex  gap-3 w-full">
-                  <Switch
-                    checked={showLineNames}
-                    onCheckedChange={setShowLineNames}
-                  />
-                  <p>Liniennamen auf Karte anzeigen</p>
-                </div>
-              </div>
+              <StopSelectionControl
+                showStops={showStops}
+                showLineNames={showLineNames}
+                setShowStops={setShowStops}
+                setShowLineNames={setShowLineNames}
+              />
             </div>
           ) : (
             <div className="absolute top-3 right-3">
@@ -216,24 +198,7 @@ function App() {
             </div>
           )}
         </div>
-        <div className=" bg-primary text-white dark:bg-background flex justify-between items-center px-3">
-          <a href="https://www.wiesbaden-neu-bewegen.de">
-            <WnbLogoSvg className="h-16 w-auto py-3" />
-          </a>
-          <h1 className="text-xl font-semibold">
-            Interaktiver Nahverkehrsplan Wiesbaden{" "}
-          </h1>
-          <div className="flex gap-5">
-            <a href="https://github.com/AnsgarH1/Wiesbaden-NVPv2-Visualisierung">
-              <div className="flex justify-center items-center  gap-2 underline ">
-                <GithubIcon className="h-4 w-auto fill-white" />
-                GitHub
-              </div>
-            </a>
-
-            
-          </div>
-        </div>
+        <Footer />
       </div>
     </div>
   );

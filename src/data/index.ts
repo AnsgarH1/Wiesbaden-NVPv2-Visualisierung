@@ -3,14 +3,16 @@ import { BusCategory, LineGroup, PlanVersion } from "@/types";
 import { v1_metroBusse } from "./version_01/v1_metrobusse";
 import { v1_quartiersBusse } from "./version_01/v1_quartiersbusse";
 import { v1_stadtBusse } from "./version_01/v1_stadtbusse";
+import { v1_stops } from "./version_01/v1_stops";
 
 import { v2_expressBusse } from "./version_02/v2_expressbusse";
 import { v2_metroBusse } from "./version_02/v2_metrobusse";
 import { v2_regionalBusse } from "./version_02/v2_regionalbusse";
 import { v2_sprinterBusse } from "./version_02/v2_sprinterbusse";
 import { v2_stadtbusse } from "./version_02/v2_stadtbusse";
+import { v2_stops } from "./version_02/v2_stops";
 
-export const busLineData: LineGroup[] = [
+const busLineData: LineGroup[] = [
   {
     category: BusCategory.METRO,
     id: "v1_metroBusse",
@@ -60,3 +62,5 @@ export const busLineData: LineGroup[] = [
     planVersion: PlanVersion.V2,
   },
 ];
+
+export { busLineData, v1_stops, v2_stops };
