@@ -78,7 +78,7 @@ export const LineSelectionControl = ({
   }
 
   return (
-    <div className="h-full">
+    <div className="flex-1">
       <h2 className="text-lg font-bold">Version auswählen</h2>
       <ToggleGroup
         type="single"

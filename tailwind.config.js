@@ -15,6 +15,10 @@ module.exports = {
       screens: {
         "2xl": "1400px",
       },
+      
+    },
+    fontFamily: {
+      'display':'Source Sans 3',
     },
     extend: {
       colors: {
