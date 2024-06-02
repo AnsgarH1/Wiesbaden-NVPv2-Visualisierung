@@ -2,6 +2,7 @@ import { getLinePaint } from "@/lib/getBusLineColor";
 import { Line, SelectablePlanVersion } from "@/types";
 import { Layer, Source } from "react-map-gl";
 import { useTheme } from "./theme-provider";
+import { FeatureCollection } from "geojson";
 
 export const LineMapSource = ({
   line,
@@ -9,17 +10,27 @@ export const LineMapSource = ({
   selectedPlanVersion,
 }: {
   line: Line;
-  showLineName: boolean
+  showLineName: boolean;
   selectedPlanVersion: SelectablePlanVersion;
 }) => {
   const { theme } = useTheme();
+
+  // set both routes as source if multiple routes exist on line
+  const data: FeatureCollection = {
+    type: "FeatureCollection",
+    features: line.routes.map((route) => ({
+      type: "Feature",
+      properties: {},
+      geometry: route.geometry,
+    })),
+  };
 
   return (
     <Source
       key={`${line.id}-source`}
       id={`${line.id}-source`}
       type="geojson"
-      data={line.routes[0].geometry}
+      data={data}
     >
       <Layer
         beforeId="top-layer"
