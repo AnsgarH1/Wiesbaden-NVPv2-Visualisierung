@@ -5,6 +5,7 @@ import "./index.css";
 import { ThemeProvider } from "./components/theme-provider.tsx";
 import { MapProvider } from "react-map-gl";
 
+import { Analytics } from "@vercel/analytics/react"
 import * as Sentry from "@sentry/react";
 
 Sentry.init({
@@ -24,6 +25,7 @@ Sentry.init({
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
+    <Analytics />
     <ThemeProvider defaultTheme="dark">
       <MapProvider>
         <App />

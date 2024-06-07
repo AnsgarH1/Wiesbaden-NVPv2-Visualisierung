@@ -3,6 +3,7 @@
 import WnbLogoTextSvg from "@/assets/wnb-logo-text.svg?react";
 import WnbLogoSvg from "@/assets/wnb-logo.svg?react";
 import GithubIcon from "@/assets/github-mark.svg?react";
+import { Button } from "./button";
 
 export const Footer = () => (
   <div className=" bg-primary text-white dark:bg-background flex  justify-between items-center px-5">
@@ -37,6 +38,13 @@ export const Footer = () => (
           GitHub
         </div>
       </a>
+      <Button
+        onClick={() => {
+          throw new Error("Sentry Test error");
+        }}
+      >
+        Throw error
+      </Button>
     </div>
   </div>
 );
