@@ -7,7 +7,6 @@ import { MapProvider } from "react-map-gl";
 
 import { Analytics } from "@vercel/analytics/react";
 import * as Sentry from "@sentry/react";
-import { Turtle } from "lucide-react";
 
 Sentry.init({
   dsn: import.meta.env.VITE_PUBLIC_SENTRY_DSN,
