@@ -38,13 +38,6 @@ export const Footer = () => (
           GitHub
         </div>
       </a>
-      <Button
-        onClick={() => {
-          throw new Error("Sentry Test error");
-        }}
-      >
-        Throw error
-      </Button>
     </div>
   </div>
 );
